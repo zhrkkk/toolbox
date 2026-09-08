@@ -1,0 +1,80 @@
+# 应用的唯一标识符 (App ID / Bundle ID)，常用于系统识别、安装路径和权限隔离
+appId: com.zhr.toolbox.app
+
+# 产品名称，用于应用安装后的快捷方式名、菜单名以及窗口默认标题等
+productName: 小张的工具箱
+
+# 目录配置
+directories:
+  # 构建资源所在目录（通常用于存放图标、安装包背景图、签名文件等）
+  buildResources: build
+  output: release/${version} # 构建产物输出目录（使用${version}动态插入版本号）
+
+# 包含或排除打包的文件匹配规则（'!' 开头表示排除）
+files:
+  - '!**/.vscode/*' # 排除 IDE 配置文件
+  - '!src/*' # 排除源码目录（打包后仅保留构建好的 target/dist）
+  - '!electron.vite.config.{js,ts,mjs,cjs}' # 排除构建工具配置文件
+  - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}' # 排除代码规范和文档等无关文件
+  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}' # 排除环境变量和包管理器锁定文件
+  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}' # 排除 TypeScript 配置文件
+
+# 从 asar 压缩包中解压出来的文件或目录（通常用于存放需要直接调用的二进制可执行文件或动态库）
+asarUnpack:
+  - resources/**
+
+# Windows 平台特定配置
+win:
+  # 生成的可执行文件名称 (.exe)
+  executableName: 小张的工具箱
+  # 额外的资源文件或目录
+  extraResources:
+    - from: bin/
+      to: bin/
+
+# Windows NSIS 安装包格式配置
+nsis:
+  # 生成的安装包文件名格式
+  artifactName: ${productName}-${version}-setup.${ext}
+  # 快捷方式名称
+  shortcutName: ${productName}
+  # 系统控制面板“添加/删除程序”中显示的名称
+  uninstallDisplayName: ${productName}
+  # 是否创建桌面快捷方式（always 表示始终创建）
+  createDesktopShortcut: always
+  oneClick: false # 是否启用一键安装（false表示允许用户自定义安装选项）
+  perMachine: false # 是否为机器级安装（false表示当前用户级安装）
+  allowToChangeInstallationDirectory: true # 是否允许用户修改安装目录
+  deleteAppDataOnUninstall: false # 卸载时是否删除应用数据（保留用户配置）
+
+# Linux 平台特定配置
+linux:
+  # 生成的目标包格式列表
+  target:
+    - AppImage
+    - snap
+    - deb
+  # 维护者信息
+  maintainer: electronjs.org
+  # 应用分类
+  category: Utility
+
+# Linux AppImage 格式特定配置
+appImage:
+  # 生成的 AppImage 文件名格式
+  artifactName: ${name}-${version}.${ext}
+
+# 打包前是否重新编译 C/C++ 原生 Node 模块（设为 false 可加快构建速度，前提是已有对应版本的预编译模块）
+npmRebuild: false
+
+# 应用自动更新 (auto-updater) 发布源配置
+publish:
+  # 发布服务提供商类型（generic 表示通用 HTTP/HTTPS 服务器）
+  provider: generic
+  # 存放更新元数据 (latest.yml) 和安装包的远端 URL 地址
+  url: https://example.com/auto-updates
+
+# Electron 预编译二进制文件下载配置
+electronDownload:
+  # 指定 Electron 依赖包下载镜像源（使用淘宝/npmmirror 镜像加快中国大陆下载速度）
+  mirror: https://npmmirror.com/mirrors/electron/

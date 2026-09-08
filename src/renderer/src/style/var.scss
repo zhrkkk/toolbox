@@ -1,0 +1,67 @@
+:root {
+  --base-font-color: #3f4254;
+  --base-bg-color: #ffffff;
+  --base-app-bg-color: #f7f7f7;
+  --base-border-radius: 0.42rem; //圆角
+  --base-active-color: #3699ff; //选中颜色
+  --base-content-bg-color: #eef0f8; //页面背景色
+
+  --base-titlebar-bg-color: #fff; //标题栏背景色
+  --base-titlebar-active-color: #e5e5e5; //标题栏按钮选中色
+  --base-titlebar-close-color: #f64e60; //标题栏关闭按钮选中色
+
+  // 响应式padding
+  --base-padding: 1rem;
+
+  //边框颜色
+  --base-border-color: #d9d9d9;
+
+  --color-info: #e1f0ff;
+  --color-primary: #3699ff;
+  --color-danger: #ffe2e5;
+  --color-error: #f64e60;
+  --color-fresh: #c9f7f5;
+  --color-success: #1bc5bd;
+  --color-forewarn: #fdf6ec;
+  --color-warn: #e6a23c;
+  --color-low: #b5b5c3;
+  --color-shallow: #f3f6f9;
+  --color-placeholder: #333333;
+
+  --color-currentSelect: #8850fb;
+
+  /* 头部 */
+  --head-height: 5rem; //头部高度
+  --head-boder-bottom: 1px solid #e6e6e6;
+  --head-font-size: 1.35rem;
+
+  --footer-height: 4.5rem;
+
+  --tab-active-bg: #f3f6f9; //tab 选中颜色
+  // 响应式宽度
+  --max-width: 100%;
+  --width-1920: 1068px;
+  --width-1280: 848px;
+  --width-960: 648px;
+
+  //阴影
+  --base-box-shadow: 1px 1px 6px 0 rgb(0 0 0 / 11%);
+  --base-box-shadow-inset: inset 0px 0px 6px 0px rgb(0 0 0 / 6%);
+
+  /* 滚动条 */
+  --scrollbar-view-width: 0.5rem;
+  --scrollbar-view-height: 0.5rem;
+  --scrollbar-line-width: 4px;
+  --scrollbar-line-height: 4px;
+  --scrollbar-border-radius: 4px;
+  --scrollbar-thumb-background-color: #bfbfbf;
+  --scrollbar-thumb-hover-background-color: #999999;
+  --scrollbar-thumb-active-background-color: #999999;
+  --scrollbar-track-background-color: transparent;
+  --scrollbar-width: 0.5rem;
+  --scrollbar-height: 0.5rem;
+  --scrollbar-hover-width: 1rem;
+  --scrollbar-hover-height: 1rem;
+  // 背景颜色
+  --background-color: linear-gradient(122.21deg, #f6f9ff 0%, #f5f4ff 100%);
+}
