@@ -4,23 +4,34 @@
       <div class="titlebar-logo">
         <img style="height: 100%" src="@renderer/assets/logo.svg" alt="logo" />
       </div>
-      <h4>{{ systemStore.title }}</h4>
+      <h4 class="px-2 h-6 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300">{{ systemStore.title }}</h4>
+    </div>
+    <div class="controller-center">
+      <div class="titlebar-btn">
+        <i class="lc:arrow-left"></i>
+      </div>
+      <div class="titlebar-btn">
+        <i class="lc:house"></i>
+      </div>
+      <div class="titlebar-btn">
+        <i class="lc:arrow-right"></i>
+      </div>
     </div>
     <div class="controller-right">
       <!-- 最小化 -->
-      <div class="titlebar-button" @click="setWindow('minimize')" title="最小化">
+      <div class="titlebar-btn" @click="setWindow('minimize')" title="最小化">
         <i class="lc:minus"></i>
       </div>
       <!-- 最大化/恢复 -->
       <div
-        class="titlebar-button"
+        class="titlebar-btn"
         @click="setWindow(isMaximized ? 'unmaximize' : 'maximize')"
         :title="isMaximized ? '恢复' : '最大化'"
       >
         <i :class="`lc:${isMaximized ? 'minimize' : 'maximize'}`"></i>
       </div>
       <!-- 关闭 -->
-      <div class="titlebar-button" data-close @click="setWindow('quit')" title="关闭">
+      <div class="titlebar-btn hover:bg-red-500! hover:text-white!" @click="setWindow('quit')" title="关闭">
         <i class="lc:x"></i>
       </div>
     </div>
@@ -71,6 +82,9 @@ watch(
 </script>
 
 <style lang="scss" scoped>
+.titlebar-btn {
+  @apply w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer;
+}
 .titlebar {
   user-select: none;
   width: 100%;
@@ -79,33 +93,16 @@ watch(
   color: var(--base-font-color);
   display: grid;
   align-items: center;
-  grid-template-columns: calc(100% - 32px * 3 - 16px) calc(32px * 3);
+  grid-template-columns: repeat(3, 1fr);
   grid-template-rows: 100%;
   grid-gap: 16px;
+  padding: 4px 8px;
 }
 .titlebar-logo {
-  padding: 4px 8px;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.titlebar-button {
-  // font-size: 0.8rem;
-  height: 100%;
-  aspect-ratio: 1 / 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.titlebar-button:hover {
-  background-color: var(--base-titlebar-active-color);
-  &[data-close] {
-    background-color: var(--base-titlebar-close-color);
-    color: #fff;
-  }
 }
 .controller-left {
   display: flex;
@@ -113,12 +110,23 @@ watch(
   height: 100%;
   app-region: drag;
   width: 100%;
+  justify-content: flex-start;
+  gap: 8px;
+}
+.controller-center {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 .controller-right {
-  app-region: no-drag;
   display: flex;
   align-items: center;
   height: 100%;
   width: 100%;
+  justify-content: flex-end;
+  gap: 8px;
 }
 </style>

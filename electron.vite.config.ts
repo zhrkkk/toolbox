@@ -3,6 +3,7 @@ import { defineConfig } from 'electron-vite'
 import vue from '@vitejs/plugin-vue'
 import VueDevTools from 'vite-plugin-vue-devtools'
 import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
 
 export default defineConfig({
   main: {},
@@ -20,7 +21,10 @@ export default defineConfig({
         imports: ['vue', 'vue-router'],
         vueTemplate: true,
         resolvers: []
+      }),
+      Components({
+        resolvers: []
       })
-    ]
+    ],
   }
 })
