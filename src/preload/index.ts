@@ -1,19 +1,8 @@
 import { ipcRenderer, contextBridge } from 'electron'
 
-// 初始化存储 port 的变量
-let staticPort: null | number = null
+// 初始化存储 config 的变量
 let staticConfig: null | object = null
-let staticPath: null | string = null
-// 监听来自主进程的 static-port 消息
-ipcRenderer.on('static-port', (_, port) => {
-  staticPort = port
-  console.log(`Received static port: ${port}`)
-})
-// 监听来自主进程的 static-port 消息
-ipcRenderer.on('static-path', (_, path) => {
-  staticPath = path
-  console.log(`Received static path: ${path}`)
-})
+
 // 监听来自主进程的 static-config 消息
 ipcRenderer.on('static-config', (_, config) => {
   staticConfig = config
@@ -56,8 +45,6 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   // }
 
   api: {
-    getStaticPort: () => staticPort,
-    getStaticPath: () => staticPath,
     getStaticConfig: () => staticConfig
   }
 })

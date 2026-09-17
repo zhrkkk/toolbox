@@ -31,7 +31,7 @@
         <i :class="`lc:${isMaximized ? 'minimize' : 'maximize'}`"></i>
       </div>
       <!-- 关闭 -->
-      <div class="titlebar-btn hover:bg-red-500! hover:text-white!" @click="setWindow('quit')" title="关闭">
+      <div class="titlebar-btn hover:bg-red-500! hover:text-white!" @click="setWindow('hide')" title="关闭">
         <i class="lc:x"></i>
       </div>
     </div>
