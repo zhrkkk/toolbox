@@ -39,26 +39,29 @@ if (!gotTheLock) {
   function createSplashWindow(): void {
     splashWin = new BrowserWindow({
       icon: join(resourcesPath, 'resources', 'icon.png'),
-      width: 400,
-      height: 300,
+      width: 400, // 初始宽度
+      height: 300, // 初始高度
       frame: false, // 无边框
       transparent: true, // 背景透明
       alwaysOnTop: true, // 保持最前
-      resizable: false,
-      center: true,
-      show: true,
+      resizable: false, // 不可调整大小
+      center: true, // 居中显示
+      show: true, // 显示启动窗口
       skipTaskbar: true, // 隐藏任务栏
       hasShadow: true, // 显示阴影
       webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true
+        nodeIntegration: false, // 禁用 Node.js 集成
+        contextIsolation: true // 启用上下文隔离，防止 XSS 攻击
       }
     })
     // 加载一个极简的本地 splash.html 文件
+    const max = 2;
+    const min = 1;
+    const randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
     if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-      splashWin.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/splash.html`)
+      splashWin.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/splash/${randomNum}.html`)
     } else {
-      splashWin.loadFile(join(__dirname, '../renderer/splash.html'))
+      splashWin.loadFile(join(__dirname, `../renderer/splash/${randomNum}.html`))
     }
   }
 
@@ -122,21 +125,22 @@ if (!gotTheLock) {
     // 创建浏览器窗口实例（初始不显示 show: false）
     win = new BrowserWindow({
       icon: join(resourcesPath, 'resources', 'icon.png'),
-      width: 1080,
-      height: 720,
-      minWidth: 1080,
-      minHeight: 720,
+      width: 1024, // 初始宽度
+      height: 768, // 初始高度
+      minWidth: 1024, // 最小宽度
+      minHeight: 768, // 最小高度
       show: false, // 隐藏主窗口，等待 ready-to-show 后再显示
-      resizable: true,
-      frame: false,
-      titleBarStyle: 'hidden',
-      hasShadow: true,
-      fullscreen: false,
-      fullscreenable: false,
+      resizable: true, // 可调整大小
+      frame: false, // 无边框
+      transparent: true, // 背景透明
+      titleBarStyle: 'hidden', // 隐藏标题栏
+      hasShadow: false, // 显示阴影
+      fullscreen: false, // 不全屏
+      fullscreenable: false, // 不可全屏
       webPreferences: {
         preload: join(__dirname, '../preload/index.js'),
-        webviewTag: true,
-        plugins: true
+        webviewTag: true, // 启用 webview 标签
+        plugins: true, // 启用插件
       }
     })
 

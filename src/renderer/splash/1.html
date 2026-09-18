@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小眼睛与嘴巴跟随动画（带速度调节）</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+      }
+      #stage {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        overflow: hidden;
+        border-radius: 28px;
+        box-shadow:
+          0 20px 50px rgba(0, 0, 0, 0.06),
+          0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+      }
+      .animated-characters-container {
+        position: relative;
+        width: 460px;
+        height: 500px;
+        flex-shrink: 0;
+        transform-origin: center center;
+        overflow: hidden;
+      }
+      .character {
+        position: absolute;
+        bottom: 0;
+        transition:
+          transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+          opacity 0.6s ease-out;
+        opacity: 0;
+        transform: translateY(100px);
+      }
+      .character.entrance-complete {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .eyes {
+        position: absolute;
+        display: flex;
+        gap: 8px;
+        transition: all 0.3s;
+      }
+      .eyeball {
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        will-change: height;
+      }
+      .pupil {
+        border-radius: 50%;
+        will-change: transform;
+      }
+
+      /* ---------- 嘴巴样式 ---------- */
+      .mouth {
+        position: absolute;
+        background: #2d2d2d;
+        transition: transform 0.1s linear;
+        will-change: transform;
+      }
+      .purple-character .mouth {
+        width: 20px;
+        height: 10px;
+        border-radius: 0 0 10px 10px;
+      }
+      .black-character .mouth {
+        width: 16px;
+        height: 8px;
+        border-radius: 8px 8px 0 0;
+        background: #ffffff; /* 修复：给黑色小人的嘴巴加上白色背景 */
+      }
+      .orange-character .mouth {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+      }
+      .yellow-character .mouth {
+        width: 18px;
+        height: 9px;
+        border-radius: 0 0 9px 9px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <div id="container" class="animated-characters-container">
+        <!-- Purple -->
+        <div id="purple" class="character purple-character">
+          <div class="eyes">
+            <div
+              class="eyeball"
+              style="width: 18px; height: 18px; background: #fff; border-radius: 50%"
+            >
+              <div class="pupil" style="width: 7px; height: 7px; background: #2d2d2d"></div>
+            </div>
+            <div
+              class="eyeball"
+              style="width: 18px; height: 18px; background: #fff; border-radius: 50%"
+            >
+              <div class="pupil" style="width: 7px; height: 7px; background: #2d2d2d"></div>
+            </div>
+          </div>
+          <div class="mouth"></div>
+        </div>
+
+        <!-- Black -->
+        <div id="black" class="character black-character">
+          <div class="eyes">
+            <div
+              class="eyeball"
+              style="width: 16px; height: 16px; background: #fff; border-radius: 50%"
+            >
+              <div class="pupil" style="width: 6px; height: 6px; background: #2d2d2d"></div>
+            </div>
+            <div
+              class="eyeball"
+              style="width: 16px; height: 16px; background: #fff; border-radius: 50%"
+            >
+              <div class="pupil" style="width: 6px; height: 6px; background: #2d2d2d"></div>
+            </div>
+          </div>
+          <div class="mouth"></div>
+        </div>
+
+        <!-- Orange -->
+        <div id="orange" class="character orange-character">
+          <div class="eyes">
+            <div class="pupil" style="width: 12px; height: 12px; background: #2d2d2d"></div>
+            <div class="pupil" style="width: 12px; height: 12px; background: #2d2d2d"></div>
+          </div>
+          <div class="mouth"></div>
+        </div>
+
+        <!-- Yellow -->
+        <div id="yellow" class="character yellow-character">
+          <div class="eyes">
+            <div class="pupil" style="width: 12px; height: 12px; background: #2d2d2d"></div>
+            <div class="pupil" style="width: 12px; height: 12px; background: #2d2d2d"></div>
+          </div>
+          <div class="mouth"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      ;(function () {
+        'use strict'
+
+        var CONFIG = {
+          enableAutoMotion: true,
+          autoSpeed: 1,
+          autoAmplitude: 0.35,
+          mouseSensitivity: 0.5
+        }
+
+        var mouseX = 0,
+          mouseY = 0,
+          pendingX = 0,
+          pendingY = 0,
+          rafId = null
+        function flush() {
+          rafId = null
+          mouseX = pendingX
+          mouseY = pendingY
+        }
+        function onPointer(e) {
+          var t = e.touches && e.touches[0]
+          pendingX = t ? t.clientX : e.clientX
+          pendingY = t ? t.clientY : e.clientY
+          if (rafId === null) rafId = requestAnimationFrame(flush)
+        }
+        window.addEventListener('mousemove', onPointer, { passive: true })
+        window.addEventListener('touchstart', onPointer, { passive: true })
+        window.addEventListener('touchmove', onPointer, { passive: true })
+
+        var container = document.getElementById('container')
+        var purpleEl = document.getElementById('purple')
+        var blackEl = document.getElementById('black')
+        var orangeEl = document.getElementById('orange')
+        var yellowEl = document.getElementById('yellow')
+
+        var LAYOUT = {
+          purple: {
+            left: 70,
+            width: 180,
+            height: 400,
+            z: 1,
+            bg: '#6C3FF5',
+            radius: '0',
+            eyesLeft: 75,
+            eyesTop: 25,
+            mouthLeft: 84,
+            mouthTop: 55,
+            skewMul: 1
+          },
+          black: {
+            left: 240,
+            width: 120,
+            height: 310,
+            z: 2,
+            bg: '#2D2D2D',
+            radius: '0',
+            eyesLeft: 26,
+            eyesTop: 32,
+            mouthLeft: 38,
+            mouthTop: 54,
+            skewMul: 1.5
+          },
+          orange: {
+            left: 0,
+            width: 240,
+            height: 150,
+            z: 3,
+            bg: '#FF9B6B',
+            radius: '120px 120px 0 0',
+            eyesLeft: 112,
+            eyesTop: 60,
+            mouthLeft: 121,
+            mouthTop: 84,
+            skewMul: 1
+          },
+          yellow: {
+            left: 310,
+            width: 140,
+            height: 230,
+            z: 4,
+            bg: '#E8D754',
+            radius: '70px 70px 0 0',
+            eyesLeft: 52,
+            eyesTop: 40,
+            mouthLeft: 59,
+            mouthTop: 62,
+            skewMul: 1
+          }
+        }
+        var clips = {
+          purple: purpleEl,
+          black: blackEl,
+          orange: orangeEl,
+          yellow: yellowEl,
+          eyes: {
+            purple: purpleEl.querySelector('.eyes'),
+            black: blackEl.querySelector('.eyes'),
+            orange: orangeEl.querySelector('.eyes'),
+            yellow: yellowEl.querySelector('.eyes')
+          },
+          mouths: {
+            purple: purpleEl.querySelector('.mouth'),
+            black: blackEl.querySelector('.mouth'),
+            orange: orangeEl.querySelector('.mouth'),
+            yellow: yellowEl.querySelector('.mouth')
+          }
+        }
+
+        var pos = {
+          purple: { x: 0, y: 0, sk: 0 },
+          black: { x: 0, y: 0, sk: 0 },
+          orange: { x: 0, y: 0, sk: 0 },
+          yellow: { x: 0, y: 0, sk: 0 }
+        }
+        var centers = {
+          purple: { x: 0, y: 0 },
+          black: { x: 0, y: 0 },
+          orange: { x: 0, y: 0 },
+          yellow: { x: 0, y: 0 }
+        }
+
+        function calc(cy, name) {
+          var ly = LAYOUT[name]
+          var dx = mouseX - cy.x,
+            dy = mouseY - cy.y
+          var range = ly.skewMul
+          return {
+            x: Math.max(-range, Math.min(range, dx / 20)),
+            y: Math.max(-range, Math.min(range, dy / 20)),
+            sk: Math.max(-6, Math.min(6, -dx / 120)),
+            dist: Math.sqrt(dx * dx + dy * dy)
+          }
+        }
+
+        function updateCenters() {
+          ;['purple', 'black', 'orange', 'yellow'].forEach(function (n) {
+            var r = document.getElementById(n).getBoundingClientRect()
+            centers[n] = { x: r.left + r.width / 2, y: r.top + r.height / 3 }
+          })
+        }
+
+        function render(timestamp) {
+          var names = ['purple', 'black', 'orange', 'yellow']
+          var time = (timestamp || 0) * 0.003 * CONFIG.autoSpeed
+
+          for (var k = 0; k < 4; k++) {
+            var name = names[k],
+              ly = LAYOUT[name],
+              el = clips[name],
+              p = pos[name]
+            p = calc(centers[name], name)
+            pos[name] = p
+
+            el.style.left = ly.left + 'px'
+            el.style.width = ly.width + 'px'
+            el.style.height = ly.height + 'px'
+            el.style.zIndex = ly.z
+            el.style.backgroundColor = ly.bg
+            el.style.borderRadius = ly.radius
+            el.style.transform = blinkOn[name]
+              ? 'skewX(' + p.sk * ly.skewMul + 'deg) translateY(3px)'
+              : 'skewX(' + p.sk * ly.skewMul + 'deg)'
+
+            clips.eyes[name].style.left = ly.eyesLeft + p.x + 'px'
+            clips.eyes[name].style.top = ly.eyesTop + p.y + 'px'
+
+            var mouthEl = clips.mouths[name]
+            mouthEl.style.left = ly.mouthLeft + p.x * 0.8 + 'px'
+            mouthEl.style.top = ly.mouthTop + p.y * 0.8 + 'px'
+
+            var autoTalk = 0
+            if (CONFIG.enableAutoMotion) {
+              autoTalk = Math.sin(time * 2 + k * 1.5) * CONFIG.autoAmplitude
+            }
+
+            var mouseReaction = Math.max(0, 1 - p.dist / 300) * CONFIG.mouseSensitivity
+
+            var scaleY = 1 + autoTalk + mouseReaction
+            var scaleX = 1 + autoTalk * 0.5
+
+            mouthEl.style.transform = 'scale(' + scaleX.toFixed(2) + ',' + scaleY.toFixed(2) + ')'
+          }
+          requestAnimationFrame(render)
+        }
+
+        var eyeballs = [].slice.call(document.querySelectorAll('.eyeball'))
+        var pupils = [].slice.call(document.querySelectorAll('.eyes > .pupil'))
+
+        function trackEyes() {
+          eyeballs.forEach(function (eye) {
+            var r = eye.getBoundingClientRect()
+            var dx = mouseX - (r.left + r.width / 2)
+            var dy = mouseY - (r.top + r.height / 2)
+            var dist = Math.min(Math.sqrt(dx * dx + dy * dy), 5)
+            var ang = Math.atan2(dy, dx)
+            var p = eye.querySelector('.pupil')
+            if (p)
+              p.style.transform =
+                'translate(' + Math.cos(ang) * dist + 'px,' + Math.sin(ang) * dist + 'px)'
+          })
+          pupils.forEach(function (pu) {
+            var r = pu.getBoundingClientRect()
+            var dx = mouseX - (r.left + r.width / 2)
+            var dy = mouseY - (r.top + r.height / 2)
+            var dist = Math.min(Math.sqrt(dx * dx + dy * dy), 5)
+            var ang = Math.atan2(dy, dx)
+            pu.style.transform =
+              'translate(' + Math.cos(ang) * dist + 'px,' + Math.sin(ang) * dist + 'px)'
+          })
+        }
+
+        var blinkOn = { purple: false, black: false, orange: false, yellow: false }
+        function scheduleBlink(name) {
+          setTimeout(
+            function () {
+              blinkOn[name] = true
+              setTimeout(function () {
+                blinkOn[name] = false
+                scheduleBlink(name)
+              }, 150)
+            },
+            Math.random() * 4000 + 3000
+          )
+        }
+
+        window.addEventListener('load', function () {
+          setTimeout(function () {
+            ;[].forEach.call(document.querySelectorAll('.character'), function (c) {
+              c.classList.add('entrance-complete')
+            })
+          }, 100)
+          function scale() {
+            var vw = window.innerWidth,
+              vh = window.innerHeight
+            container.style.transform = 'scale(' + Math.min(vw / 460, vh / 500) + ')'
+          }
+          scale()
+          window.addEventListener('resize', scale)
+          updateCenters()
+          setInterval(updateCenters, 500)
+          scheduleBlink('purple')
+          scheduleBlink('black')
+          scheduleBlink('orange')
+          scheduleBlink('yellow')
+          setInterval(trackEyes, 16)
+          requestAnimationFrame(render)
+        })
+      })()
+    </script>
+  </body>
+</html>

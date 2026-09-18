@@ -1,37 +1,37 @@
 <template>
-  <div class="titlebar">
+  <div class="titlebar" @dblclick="setWindow(isMaximized ? 'unmaximize' : 'maximize')">
     <div class="controller-left">
-      <div class="titlebar-logo">
+      <div class="titlebar-logo drag-flag">
         <img style="height: 100%" src="@renderer/assets/logo.svg" alt="logo" />
       </div>
-      <h4 class="px-2 h-6 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300">{{ systemStore.title }}</h4>
+      <h4 class="drag-flag px-2 h-6 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300">{{ systemStore.title }}</h4>
     </div>
     <div class="controller-center">
-      <div class="titlebar-btn">
+      <div class="titlebar-btn" @dblclick.stop>
         <i class="lc:arrow-left"></i>
       </div>
-      <div class="titlebar-btn">
+      <div class="titlebar-btn" @dblclick.stop>
         <i class="lc:house"></i>
       </div>
-      <div class="titlebar-btn">
+      <div class="titlebar-btn" @dblclick.stop>
         <i class="lc:arrow-right"></i>
       </div>
     </div>
     <div class="controller-right">
       <!-- 最小化 -->
-      <div class="titlebar-btn" @click="setWindow('minimize')" title="最小化">
+      <div class="titlebar-btn" @click.stop="setWindow('minimize')" title="最小化">
         <i class="lc:minus"></i>
       </div>
       <!-- 最大化/恢复 -->
       <div
         class="titlebar-btn"
-        @click="setWindow(isMaximized ? 'unmaximize' : 'maximize')"
+        @click.stop="setWindow(isMaximized ? 'unmaximize' : 'maximize')"
         :title="isMaximized ? '恢复' : '最大化'"
       >
         <i :class="`lc:${isMaximized ? 'minimize' : 'maximize'}`"></i>
       </div>
       <!-- 关闭 -->
-      <div class="titlebar-btn hover:bg-red-500! hover:text-white!" @click="setWindow('hide')" title="关闭">
+      <div class="titlebar-btn hover:bg-red-500! hover:text-white!" @click.stop="setWindow('hide')" title="关闭">
         <i class="lc:x"></i>
       </div>
     </div>
@@ -85,6 +85,9 @@ watch(
 .titlebar-btn {
   @apply w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer;
 }
+.drag-flag {
+  app-region: drag;
+}
 .titlebar {
   user-select: none;
   width: 100%;
@@ -108,7 +111,6 @@ watch(
   display: flex;
   align-items: center;
   height: 100%;
-  app-region: drag;
   width: 100%;
   justify-content: flex-start;
   gap: 8px;
